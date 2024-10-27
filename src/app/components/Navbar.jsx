@@ -48,6 +48,11 @@ export default function Navbar() {
                   {item.name}
                 </Link>
               ))}
+              <Link href="/login" passHref>
+                <Button variant="outline" className="text-white hover:bg-teal-500 font-bold py-2 px-4 rounded-md flex items-center">
+                  Client Login
+                </Button>
+              </Link>
               <Button className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-md flex items-center">
                 Book A call
                 <ArrowRight className="ml-2 h-4 w-4" />
