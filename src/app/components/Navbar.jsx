@@ -48,7 +48,7 @@ export default function Navbar() {
                   {item.name}
                 </Link>
               ))}
-              <Link href="/login" passHref>
+              <Link href="/portal" passHref>
                 <Button variant="outline" className="text-white hover:bg-teal-500 font-bold py-2 px-4 rounded-md flex items-center">
                   Client Login
                 </Button>

@@ -1,24 +1,28 @@
-// src/middleware.js
-import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { withAuth } from 'next-auth/middleware';
+import { NextResponse } from 'next/server';
 
-export function middleware(req) {
-  const { pathname } = req.nextUrl;
-  const userSession = cookies().get("user-session");
 
-  if (!userSession && pathname.startsWith("/dashboard")) {
-    return NextResponse.redirect(new URL("/login", req.url));
+export default withAuth(
+  function middleware(req) {
+    console.info("Middleware triggered", { path: req.nextUrl.pathname });
+
+    const { pathname } = req.nextUrl;
+    const userRole = req.nextauth.token?.user.role;
+    console.info("User role", { role: userRole, path: req.nextUrl.pathname });
+
+    // Restrict certain pages to admins only
+    if (pathname.startsWith("/admin") && userRole !== "admin") {
+      console.warn("Forbidden access for non-admin user", { path: req.nextUrl.pathname });
+      return NextResponse.redirect(new URL("/dashboard", req.url));
+    }
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token, // Only allow logged-in users
+    },
   }
-
-  const user = userSession ? JSON.parse(userSession.value) : null;
-
-  if (pathname.startsWith("/dashboard/admin") && (!user || user.role !== "admin")) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  return NextResponse.next();
-}
+);
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/dashboard/admin/:path*"],
+  matcher: ["/admin/:path*", "/dashboard/:path*", "/login", "/register"],
 };
