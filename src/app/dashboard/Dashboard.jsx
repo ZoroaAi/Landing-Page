@@ -1,164 +1,199 @@
 'use client'
 
-import { useSession } from "next-auth/react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  BarChart, 
-  Users, 
-  ShoppingCart, 
-  Activity,
-  DollarSign,
-  ArrowUpRight,
+import * as React from "react"
+import { Line, LineChart, ResponsiveContainer, Tooltip, CartesianGrid, XAxis } from "recharts";
+import {
+  Bot,
+  Calendar,
+  Plus,
+  Receipt,
+  Timer,
 } from "lucide-react"
 
-export default function Dashboard() {
-  const { data: session } = useSession()
-  const isAdmin = session?.user?.role === "admin"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "$45,231.89",
-      icon: DollarSign,
-      change: "+20.1%",
-    },
-    {
-      title: isAdmin ? "Total Users" : "Active Subscriptions",
-      value: isAdmin ? "1,234" : "2,350",
-      icon: Users,
-      change: "+10.1%",
-    },
-    {
-      title: "Sales",
-      value: "12,234",
-      icon: ShoppingCart,
-      change: "+19%",
-    },
-    {
-      title: "Active Now",
-      value: "573",
-      icon: Activity,
-      change: "+201",
-    }
-  ]
+// Sample data - replace with real data
+const operationsData = [
+  { date: "Jan", operations: 125 },
+  { date: "Feb", operations: 147 },
+  { date: "Mar", operations: 162 },
+  { date: "Apr", operations: 158 },
+  { date: "May", operations: 184 },
+  { date: "Jun", operations: 196 },
+]
 
-  const recentSales = [
-    { name: "Olivia Martin", email: "olivia.martin@email.com", amount: "+$1,999.00" },
-    { name: "Jackson Lee", email: "jackson.lee@email.com", amount: "+$39.00" },
-    { name: "Isabella Nguyen", email: "isabella.nguyen@email.com", amount: "+$299.00" }
-  ]
+const recentActivity = [
+  {
+    id: 1,
+    type: "automation",
+    title: "Email Sequence Updated",
+    description: "Modified follow-up sequence timing",
+    timestamp: "2 hours ago",
+  },
+  {
+    id: 2,
+    type: "meeting",
+    title: "Strategy Call Scheduled",
+    description: "Meeting with John Doe",
+    timestamp: "5 hours ago",
+  },
+  {
+    id: 3,
+    type: "task",
+    title: "New Task Created",
+    description: "Website automation setup",
+    timestamp: "1 day ago",
+  },
+]
+
+export default function DashboardPage() {
+  const [progress, setProgress] = React.useState(66)
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold text-white">Dashboard</h2>
+    <div className="flex-1 space-y-6 p-8">
+      <div className="flex items-center justify-between space-y-2">
+        <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
       </div>
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="bg-gray-800 border border-gray-700 rounded-lg">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat, index) => (
-              <Card key={index} className="bg-gray-800 border-gray-700">
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-400">
-                    {stat.title}
-                  </CardTitle>
-                  <stat.icon className="h-4 w-4 text-gray-400" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-white">{stat.value}</div>
-                  <p className="text-xs text-gray-400">
-                    <span className="inline-flex items-center text-green-500">
-                      <ArrowUpRight className="mr-1 h-4 w-4" />
-                      {stat.change}
-                    </span>
-                    {" "}from last month
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] bg-gray-700 rounded-md flex items-center justify-center text-gray-400">
-                  Chart placeholder
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Automations</CardTitle>
+            <Bot className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">24</div>
+            <p className="text-xs text-muted-foreground">
+              +2 from last month
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Monthly Operations</CardTitle>
+            <Timer className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,429</div>
+            <p className="text-xs text-muted-foreground">
+              +201 from last month
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Operations Row */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Operations Usage</CardTitle>
+            <CardDescription>Your monthly operations usage over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer
+              config={{
+                operations: {
+                  label: "Operations",
+                  color: "hsl(var(--chart-1))",
+                },
+              }}
+              className="h-[300px]"
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={operationsData}>
+                  <Line
+                    type="monotone"
+                    dataKey="operations"
+                    strokeWidth={2}
+                    activeDot={{
+                      r: 8,
+                    }}
+                  />
+                  <Tooltip content={<ChartTooltipContent />} />
+                </LineChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Operations Limit</CardTitle>
+            <CardDescription>Monthly operations usage limit</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-8">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <div>Used Operations</div>
+                <div className="text-muted-foreground">1,429 / 2,000</div>
+              </div>
+              <Progress value={progress} className="h-2" />
+            </div>
+            <div className="rounded-lg border bg-muted/50 p-4">
+              <div className="text-sm font-medium">Tip</div>
+              <div className="text-sm text-muted-foreground">
+                You are using 66% of your monthly operations limit. Consider upgrading your plan if you need more operations.
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent ACtivity and Quick Actions */}
+      <div className="grid gap-6 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>Your latest automation activities</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-8">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="flex items-center">
+                  <div className="space-y-1">
+                    <p className="text-sm font-medium leading-none">{activity.title}</p>
+                    <p className="text-sm text-muted-foreground">{activity.description}</p>
+                  </div>
+                  <div className="ml-auto text-sm text-muted-foreground">
+                    {activity.timestamp}
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Recent Sales</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {recentSales.map((sale, index) => (
-                    <div key={index} className="flex items-center">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-white">{sale.name}</p>
-                        <p className="text-sm text-gray-400">{sale.email}</p>
-                      </div>
-                      <div className="ml-auto font-medium text-green-500">{sale.amount}</div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          {isAdmin && (
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">Admin Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-400">This section is only visible to admins.</p>
-                <div className="mt-4 h-[200px] bg-gray-700 rounded-md flex items-center justify-center text-gray-400">
-                  Admin chart placeholder
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
-        <TabsContent value="analytics">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Analytics Content</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">Analytics content goes here.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="reports">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Reports Content</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">Reports content goes here.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="notifications">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardHeader>
-              <CardTitle className="text-white">Notifications Content</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400">Notifications content goes here.</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Quick Actions</CardTitle>
+            <CardDescription>Common tasks and actions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4">
+              <Button className="w-full justify-start gap-2">
+                <Plus className="h-4 w-4" />
+                New Automation Task
+              </Button>
+              <Button className="w-full justify-start gap-2">
+                <Calendar className="h-4 w-4" />
+                Schedule Meeting
+              </Button>
+              <Button className="w-full justify-start gap-2">
+                <Receipt className="h-4 w-4" />
+                View Recent Invoices
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

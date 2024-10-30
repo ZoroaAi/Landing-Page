@@ -1,80 +1,111 @@
+'use client'
+
+import * as React from "react"
 import Link from "next/link"
-import { BarChart, Users, Package, Settings, LogOut } from "lucide-react"
+import {
+  LayoutDashboard,
+  Cog,
+  Bot,
+  FolderKanban,
+  Receipt,
+  Calendar,
+  BarChart3,
+  HelpCircle,
+  LogOut,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
-  Sidebar as SidebarComponent,
+  Sidebar,
   SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
+  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarRail,
 } from "@/components/ui/sidebar"
 
 const menuItems = [
-  { href: "/dashboard", label: "Overview", icon: BarChart },
-  { href: "/dashboard/customers", label: "Customers", icon: Users },
-  { href: "/dashboard/products", label: "Products", icon: Package },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  {
+    title: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/dashboard",
+  },
+  {
+    title: "Automations Management",
+    icon: Bot,
+    href: "/dashboard/automations",
+  },
+  {
+    title: "Project Management",
+    icon: FolderKanban,
+    href: "/dashboard/projects",
+  },
+  {
+    title: "Invoices & Billing",
+    icon: Receipt,
+    href: "/dashboard/billing",
+  },
+  {
+    title: "Meetings & Scheduling",
+    icon: Calendar,
+    href: "/dashboard/meetings",
+  },
+  {
+    title: "Reports & Analytics",
+    icon: BarChart3,
+    href: "/dashboard/analytics",
+  },
+  {
+    title: "Support & Helpdesk",
+    icon: HelpCircle,
+    href: "/dashboard/support",
+  },
+  {
+    title: "Settings & Preferences",
+    icon: Cog,
+    href: "/dashboard/settings",
+  },
 ]
 
-export function Sidebar({ session, pathname }) {
-  const isAdmin = session?.user?.role === "admin"
-
-  const allMenuItems = isAdmin
-    ? [...menuItems, { href: "/dashboard/admin", label: "Admin", icon: Settings }]
-    : menuItems
-
+export function CustomSidebar({ session, pathname }) {
   return (
-    <SidebarComponent className="w-64 bg-gray-800 border-r border-gray-700">
-      <SidebarHeader className="p-4">
-        <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+    <Sidebar>
+      <SidebarHeader className="border-b px-6 py-4">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <Bot className="h-6 w-6" />
+          <span className="font-semibold">Automation Portal</span>
+        </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-4 py-2 text-sm font-semibold text-gray-400">
-            Menu
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {allMenuItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={`flex items-center px-4 py-2 text-sm ${
-                      pathname === item.href
-                        ? "text-blue-400 bg-gray-700"
-                        : "text-gray-300 hover:bg-gray-700"
-                    }`}
-                  >
-                    <item.icon className="mr-2 h-4 w-4" />
-                    <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      <SidebarRail className="p-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-gray-300 hover:bg-gray-700"
-              onClick={() => {
-                // Add logout functionality here
-              }}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Logout</span>
-            </Button>
-          </SidebarMenuItem>
+        <SidebarMenu className="p-2">
+          {menuItems.map((item) => (
+            <SidebarMenuItem key={item.href}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === item.href}
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-2"
+              >
+                <Link href={item.href}>
+                  <item.icon className="h-4 w-4" />
+                  <span>{item.title}</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
         </SidebarMenu>
-      </SidebarRail>
-    </SidebarComponent>
+      </SidebarContent>
+      <SidebarFooter className="border-t p-4">
+        <Button
+          variant="ghost"
+          className="w-full justify-start gap-2"
+          onClick={() => {
+            // Add logout logic here
+          }}
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </Button>
+      </SidebarFooter>
+    </Sidebar>
   )
 }
