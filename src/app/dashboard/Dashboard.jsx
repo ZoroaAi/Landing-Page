@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from "react"
-import { Line, LineChart, ResponsiveContainer, Tooltip, CartesianGrid, XAxis } from "recharts";
+import { Line, LineChart, ResponsiveContainer, Tooltip, CartesianGrid, XAxis, YAxis, Area, AreaChart } from "recharts";
 import {
   Bot,
   Calendar,
@@ -19,18 +19,25 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-// Sample data - replace with real data
-const operationsData = [
-  { date: "Jan", operations: 125 },
-  { date: "Feb", operations: 147 },
-  { date: "Mar", operations: 162 },
-  { date: "Apr", operations: 158 },
-  { date: "May", operations: 184 },
-  { date: "Jun", operations: 196 },
-]
+// Chart
+const data = [
+  { date: '01-11-2024', operations: 3, dataTransfer: 3616 },
+  { date: '02-11-2024', operations: 5, dataTransfer: 4580 },
+  { date: '03-11-2024', operations: 3, dataTransfer: 3338 },
+  { date: '04-11-2024', operations: 15, dataTransfer: 11138 },
+  { date: '05-11-2024', operations: 3, dataTransfer: 3338 },
+  { date: '06-11-2024', operations: 3, dataTransfer: 3338 },
+  { date: '07-11-2024', operations: 3, dataTransfer: 3338 },
+];
 
+const chartConfig = {
+  operations: { label: 'Operations', color: 'hsl(var(--chart-1))' },
+  dataTransfer: { label: 'Data Transfer (KB)', color: 'hsl(var(--chart-2))' },
+}
+
+// Recent Activity
 const recentActivity = [
   {
     id: 1,
@@ -98,32 +105,53 @@ export default function DashboardPage() {
             <CardDescription>Your monthly operations usage over time</CardDescription>
           </CardHeader>
           <CardContent>
-            <ChartContainer
-              config={{
-                operations: {
-                  label: "Operations",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-              className="h-[300px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={operationsData}>
-                  <Line
-                    type="monotone"
-                    dataKey="operations"
-                    strokeWidth={2}
-                    activeDot={{
-                      r: 8,
-                    }}
-                  />
-                  <Tooltip content={<ChartTooltipContent />} />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+          <ChartContainer config={chartConfig}>
+          <AreaChart
+            accessibilityLayer
+            data={data}
+            margin={{
+              top: 10,
+              right: 30,
+              left: 0,
+              bottom: 0,
+            }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis
+              dataKey="date"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => value.slice(0, 5)}
+            />
+            <YAxis yAxisId="left" />
+            <YAxis yAxisId="right" orientation="right" />
+            <ChartTooltip
+              content={<ChartTooltipContent />}
+            />
+            <Area
+              yAxisId="left"
+              type="monotone"
+              dataKey="operations"
+              stackId="1"
+              stroke="var(--color-operations)"
+              fill="var(--color-operations)"
+              fillOpacity={0.3}
+            />
+            <Area
+              yAxisId="right"
+              type="monotone"
+              dataKey="dataTransfer"
+              stackId="2"
+              stroke="var(--color-dataTransfer)"
+              fill="var(--color-dataTransfer)"
+              fillOpacity={0.3}
+            />
+            <ChartLegend content={<ChartLegendContent />} />
+          </AreaChart>
+        </ChartContainer>
           </CardContent>
         </Card>
-
         
         <Card>
           <CardHeader>
